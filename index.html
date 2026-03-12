@@ -548,7 +548,7 @@ function render() {
     }
   });
 
-  const totalRaised = Object.values(divTotals).reduce(function(a, b) { return a + b; }, 0);
+  const totalRaised = allFundraisers.reduce(function(sum, f) { return sum + f.amount; }, 0);
   const totalPct = Math.min((totalRaised / TOTAL_GOAL) * 100, 100);
 
   // Overall - using DOM methods
