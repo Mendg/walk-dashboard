@@ -702,38 +702,59 @@ document.getElementById('divisionFile').addEventListener('change', function(e) {
   reader.readAsText(file);
 });
 
-// Auto-load local files if served from same directory
-async function tryAutoLoad() {
+// Auto-fetch live data from walk4friendship.com via /api/scrape
+async function fetchLiveData() {
   try {
-    const results = await Promise.all([
-      fetch('fundraiser-data.csv').catch(function() { return null; }),
-      fetch('divisions.csv').catch(function() { return null; })
-    ]);
-    const frRes = results[0];
-    const dvRes = results[1];
+    const res = await fetch('/api/scrape');
+    if (!res.ok) throw new Error('API returned ' + res.status);
+    const data = await res.json();
 
+    fundraiserData = data.fundraisers.map(function(f) {
+      return { fundraiser_name: f.name, amount_raised: String(f.amount), page_url: f.url };
+    });
+
+    var ts = new Date(data.scraped_at).toLocaleString();
+    document.getElementById('fundraiserStatus').textContent = 'Live from walk4friendship.com (' + data.count + ' fundraisers, ' + ts + ')';
+    return true;
+  } catch(e) {
+    console.log('Live scrape unavailable, falling back to CSV:', e.message);
+    return false;
+  }
+}
+
+async function tryAutoLoad() {
+  // Try live scrape first
+  var liveLoaded = await fetchLiveData();
+
+  // Load division mapping (always needed)
+  try {
+    var dvRes = await fetch('divisions.csv').catch(function() { return null; });
     if (dvRes && dvRes.ok) {
-      const text = await dvRes.text();
-      const rows = parseCSV(text);
+      var text = await dvRes.text();
+      var rows = parseCSV(text);
       divisionMap = {};
       rows.forEach(function(r) {
-        const name = r.fundraiser_name || r.name || '';
-        const div = r.division || '';
+        var name = r.fundraiser_name || r.name || '';
+        var div = r.division || '';
         if (name && div) divisionMap[name] = div;
       });
       document.getElementById('divisionStatus').textContent = 'divisions.csv (auto-loaded, ' + rows.length + ' mappings)';
     }
+  } catch(e) {}
 
-    if (frRes && frRes.ok) {
-      const text = await frRes.text();
-      fundraiserData = parseCSV(text);
-      document.getElementById('fundraiserStatus').textContent = 'fundraiser-data.csv (auto-loaded, ' + fundraiserData.length + ' rows)';
-    }
-
-    render();
-  } catch(e) {
-    render();
+  // If live scrape failed, try local CSV
+  if (!liveLoaded) {
+    try {
+      var frRes = await fetch('fundraiser-data.csv').catch(function() { return null; });
+      if (frRes && frRes.ok) {
+        var text = await frRes.text();
+        fundraiserData = parseCSV(text);
+        document.getElementById('fundraiserStatus').textContent = 'fundraiser-data.csv (auto-loaded, ' + fundraiserData.length + ' rows)';
+      }
+    } catch(e) {}
   }
+
+  render();
 }
 
 tryAutoLoad();
