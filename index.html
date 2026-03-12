@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Walk4Friendship 2026 - Division Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --navy: #1b365d;
+  --teal: #36bbae;
+  --teal-light: #e6f7f5;
+  --cream: #f8f5f1;
+  --green: #22c55e;
+  --yellow: #eab308;
+  --red: #ef4444;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-400: #9ca3af;
+  --gray-600: #4b5563;
+  --gray-800: #1f2937;
+}
+
+body {
+  font-family: 'Inter', 'Proxima Nova', Arial, sans-serif;
+  background: var(--cream);
+  color: var(--gray-800);
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.header h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.header .subtitle {
+  font-size: 15px;
+  color: var(--gray-600);
+}
+.header .bh {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+/* Overall progress */
+.overall {
+  background: var(--navy);
+  color: white;
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.overall::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 160px;
+  height: 160px;
+  background: rgba(54, 187, 174, 0.12);
+  border-radius: 50%;
+}
+.overall-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.overall-label {
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+.overall-amount {
+  font-size: 36px;
+  font-weight: 800;
+}
+.overall-amount .goal-text {
+  font-size: 18px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+.overall-bar-track {
+  background: rgba(255,255,255,0.15);
+  border-radius: 8px;
+  height: 14px;
+  overflow: hidden;
+}
+.overall-bar-fill {
+  height: 100%;
+  border-radius: 8px;
+  background: var(--teal);
+  transition: width 0.8s ease;
+}
+.overall-pct {
+  text-align: right;
+  font-size: 13px;
+  margin-top: 6px;
+  opacity: 0.7;
+}
+
+/* File inputs */
+.file-controls {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.file-control {
+  flex: 1;
+  min-width: 240px;
+  background: white;
+  border: 2px dashed var(--gray-200);
+  border-radius: 12px;
+  padding: 16px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.file-control:hover {
+  border-color: var(--teal);
+}
+.file-control label {
+  display: block;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--navy);
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+.file-control .hint {
+  font-size: 12px;
+  color: var(--gray-400);
+}
+.file-control input[type="file"] {
+  display: none;
+}
+.file-control .status {
+  font-size: 12px;
+  color: var(--teal);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* Alerts */
+.alert {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  display: none;
+}
+.alert strong {
+  color: #92400e;
+}
+
+/* Division grid */
+.divisions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.division-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  border-left: 5px solid var(--gray-200);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.division-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.division-card.status-green { border-left-color: var(--green); }
+.division-card.status-yellow { border-left-color: var(--yellow); }
+.division-card.status-red { border-left-color: var(--red); }
+
+.div-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.div-name {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.div-lead {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-top: 2px;
+}
+.div-pct {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--navy);
+}
+
+.div-bar-track {
+  background: var(--gray-100);
+  border-radius: 6px;
+  height: 10px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.div-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.6s ease;
+}
+.div-bar-fill.status-green { background: var(--green); }
+.div-bar-fill.status-yellow { background: var(--yellow); }
+.div-bar-fill.status-red { background: var(--red); }
+
+.div-stats {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--gray-600);
+}
+.div-stats .amount {
+  font-weight: 600;
+}
+
+.div-benchmark {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--gray-100);
+  font-size: 12px;
+  color: var(--gray-400);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.benchmark-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.benchmark-badge.ahead { background: #dcfce7; color: #166534; }
+.benchmark-badge.on-track { background: #fef9c3; color: #854d0e; }
+.benchmark-badge.behind { background: #fee2e2; color: #991b1b; }
+
+/* Leaderboard */
+.leaderboard {
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  margin-bottom: 24px;
+}
+.leaderboard h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 16px;
+}
+.leader-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.leader-row:last-child { border-bottom: none; }
+.leader-rank {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--gray-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gray-600);
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+.leader-rank.top-3 {
+  background: var(--navy);
+  color: white;
+}
+.leader-name {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+}
+.leader-division {
+  font-size: 12px;
+  color: var(--gray-400);
+  margin-right: 16px;
+}
+.leader-amount {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--gray-400);
+  padding: 16px 0;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .container { padding: 16px 12px; }
+  .header h1 { font-size: 22px; }
+  .overall { padding: 20px; }
+  .overall-amount { font-size: 28px; }
+  .divisions-grid { grid-template-columns: 1fr; }
+  .file-controls { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div style="position:relative;">
+    <span class="header bh">B"H</span>
+  </div>
+
+  <div class="header">
+    <h1>Walk4Friendship 2026</h1>
+    <p class="subtitle">Division Fundraising Dashboard</p>
+  </div>
+
+  <!-- File Inputs -->
+  <div class="file-controls">
+    <div class="file-control" onclick="document.getElementById('fundraiserFile').click()">
+      <label>Fundraiser Data (CSV)</label>
+      <div class="hint">Export from Neon Fundraise: Name, Amount Raised, Page URL</div>
+      <input type="file" id="fundraiserFile" accept=".csv">
+      <div class="status" id="fundraiserStatus"></div>
+    </div>
+    <div class="file-control" onclick="document.getElementById('divisionFile').click()">
+      <label>Division Mapping (CSV)</label>
+      <div class="hint">fundraiser_name, division</div>
+      <input type="file" id="divisionFile" accept=".csv">
+      <div class="status" id="divisionStatus"></div>
+    </div>
+  </div>
+
+  <!-- Overall Progress -->
+  <div class="overall">
+    <div class="overall-top">
+      <span class="overall-label">Total Raised</span>
+      <div class="overall-amount" id="overallAmount"></div>
+    </div>
+    <div class="overall-bar-track">
+      <div class="overall-bar-fill" id="overallBar" style="width:0%"></div>
+    </div>
+    <div class="overall-pct" id="overallPct">0%</div>
+  </div>
+
+  <!-- Unassigned Alert -->
+  <div class="alert" id="unassignedAlert"></div>
+
+  <!-- Division Cards -->
+  <div class="divisions-grid" id="divisionsGrid"></div>
+
+  <!-- Leaderboard -->
+  <div class="leaderboard">
+    <h2>Top Fundraisers</h2>
+    <div id="leaderboardBody"></div>
+  </div>
+
+  <div class="footer" id="footer">
+    Load CSV files above to populate the dashboard.
+  </div>
+</div>
+
+<script>
+const TOTAL_GOAL = 1250000;
+
+const DIVISIONS = [
+  { name: 'Families', goal: 550000, leads: 'Emily, Alana, Julie', benchmarks: { '2026-07-12': 150000, '2026-08-02': 330000, '2026-08-23': 480000 } },
+  { name: 'Top 20 Teams', goal: 390000, leads: 'Julie', benchmarks: { '2026-07-12': 100000, '2026-08-02': 230000, '2026-08-23': 340000 } },
+  { name: 'Corporate', goal: 370000, leads: 'Julie', benchmarks: { '2026-07-12': 200000, '2026-08-02': 300000, '2026-08-23': 370000 } },
+  { name: 'Individual', goal: 110000, leads: 'Julie', benchmarks: { '2026-07-12': 30000, '2026-08-02': 65000, '2026-08-23': 95000 } },
+  { name: 'FC Staff', goal: 70000, leads: 'Julie', benchmarks: { '2026-07-12': 20000, '2026-08-02': 45000, '2026-08-23': 62000 } },
+  { name: 'Adult Volunteers', goal: 50000, leads: 'Mendel & Shayna', benchmarks: { '2026-07-12': 13000, '2026-08-02': 30000, '2026-08-23': 44000 } },
+  { name: 'Friendship House', goal: 25000, leads: 'Benny', benchmarks: { '2026-07-12': 6000, '2026-08-02': 14000, '2026-08-23': 22000 } },
+  { name: 'Schools', goal: 15000, leads: 'Kaitlin', benchmarks: { '2026-07-12': 3000, '2026-08-02': 9000, '2026-08-23': 13000 } },
+  { name: 'Summer Camp Staff', goal: 15000, leads: 'Airen', benchmarks: { '2026-07-12': 4000, '2026-08-02': 9000, '2026-08-23': 13500 } },
+  { name: 'Teen Volunteers', goal: 10000, leads: 'Dovid & Chana', benchmarks: { '2026-07-12': 2500, '2026-08-02': 6000, '2026-08-23': 9000 } },
+];
+
+let fundraiserData = [];
+let divisionMap = {};
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = parseCSVLine(lines[0]);
+  return lines.slice(1).filter(function(l) { return l.trim(); }).map(function(line) {
+    const vals = parseCSVLine(line);
+    const obj = {};
+    headers.forEach(function(h, i) {
+      obj[h.trim().toLowerCase().replace(/\s+/g, '_')] = (vals[i] || '').trim();
+    });
+    return obj;
+  });
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (inQuotes) {
+      if (ch === '"' && line[i+1] === '"') { current += '"'; i++; }
+      else if (ch === '"') { inQuotes = false; }
+      else { current += ch; }
+    } else {
+      if (ch === '"') { inQuotes = true; }
+      else if (ch === ',') { result.push(current); current = ''; }
+      else { current += ch; }
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function parseMoney(str) {
+  if (!str) return 0;
+  return parseFloat(str.replace(/[$,\s]/g, '')) || 0;
+}
+
+function fmtMoney(n) {
+  if (n >= 1000000) return '$' + (n / 1000000).toFixed(2) + 'M';
+  if (n >= 1000) return '$' + Math.round(n).toLocaleString();
+  return '$' + n.toFixed(0);
+}
+
+function escapeText(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.textContent;
+}
+
+function getStatusClass(pct, benchmarkPct) {
+  if (benchmarkPct === null) {
+    if (pct >= 50) return 'green';
+    if (pct >= 25) return 'yellow';
+    return 'red';
+  }
+  if (pct >= benchmarkPct) return 'green';
+  if (pct >= benchmarkPct * 0.75) return 'yellow';
+  return 'red';
+}
+
+function getCurrentBenchmark(benchmarks) {
+  const today = new Date();
+  const dates = Object.keys(benchmarks).sort();
+  let activeDateStr = null;
+  let activeTarget = null;
+
+  for (const d of dates) {
+    const benchDate = new Date(d + 'T00:00:00');
+    if (today >= benchDate) {
+      activeDateStr = d;
+      activeTarget = benchmarks[d];
+    }
+  }
+
+  if (activeDateStr === null && dates.length > 0) {
+    activeDateStr = dates[0];
+    activeTarget = benchmarks[dates[0]];
+    return { dateStr: activeDateStr, target: activeTarget, label: 'Next target', upcoming: true };
+  }
+
+  if (activeDateStr === null) return null;
+  return { dateStr: activeDateStr, target: activeTarget, label: formatBenchDate(activeDateStr), upcoming: false };
+}
+
+function formatBenchDate(str) {
+  const d = new Date(str + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+function createEl(tag, className, textContent) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (textContent) el.textContent = textContent;
+  return el;
+}
+
+function render() {
+  const divLookup = {};
+  Object.entries(divisionMap).forEach(function(entry) {
+    divLookup[entry[0].toLowerCase()] = entry[1];
+  });
+
+  const divTotals = {};
+  const divFundraisers = {};
+  DIVISIONS.forEach(function(d) { divTotals[d.name] = 0; divFundraisers[d.name] = 0; });
+
+  const unassigned = [];
+  const allFundraisers = [];
+
+  fundraiserData.forEach(function(row) {
+    const name = row.fundraiser_name || row.name || '';
+    const amount = parseMoney(row.amount_raised || row.amount || row.total || '0');
+    if (!name) return;
+
+    allFundraisers.push({ name: name, amount: amount, division: divLookup[name.toLowerCase()] || null });
+
+    const div = divLookup[name.toLowerCase()];
+    if (div && divTotals.hasOwnProperty(div)) {
+      divTotals[div] += amount;
+      divFundraisers[div]++;
+    } else {
+      unassigned.push(name);
+    }
+  });
+
+  const totalRaised = Object.values(divTotals).reduce(function(a, b) { return a + b; }, 0);
+  const totalPct = Math.min((totalRaised / TOTAL_GOAL) * 100, 100);
+
+  // Overall - using DOM methods
+  const overallEl = document.getElementById('overallAmount');
+  overallEl.textContent = '';
+  overallEl.appendChild(document.createTextNode(fmtMoney(totalRaised) + ' '));
+  const goalSpan = createEl('span', 'goal-text', 'of ' + fmtMoney(TOTAL_GOAL));
+  overallEl.appendChild(goalSpan);
+
+  document.getElementById('overallBar').style.width = totalPct + '%';
+  document.getElementById('overallPct').textContent = totalPct.toFixed(1) + '%';
+
+  // Unassigned alert
+  const alertEl = document.getElementById('unassignedAlert');
+  alertEl.textContent = '';
+  if (unassigned.length > 0) {
+    alertEl.style.display = 'block';
+    const strong = createEl('strong', null, 'Unassigned Fundraisers');
+    alertEl.appendChild(strong);
+    alertEl.appendChild(document.createTextNode(' - These people are in your data but not mapped to a division:'));
+    const ul = document.createElement('ul');
+    ul.style.margin = '6px 0 0 18px';
+    ul.style.color = '#92400e';
+    unassigned.forEach(function(n) {
+      const li = createEl('li', null, n);
+      ul.appendChild(li);
+    });
+    alertEl.appendChild(ul);
+  } else {
+    alertEl.style.display = 'none';
+  }
+
+  // Division cards
+  const grid = document.getElementById('divisionsGrid');
+  grid.textContent = '';
+
+  var sortedDivisions = DIVISIONS.slice().sort(function(a, b) {
+    return (divTotals[b.name] || 0) - (divTotals[a.name] || 0);
+  });
+
+  sortedDivisions.forEach(function(div) {
+    const raised = divTotals[div.name] || 0;
+    const pct = Math.min((raised / div.goal) * 100, 100);
+    const count = divFundraisers[div.name] || 0;
+    const bench = getCurrentBenchmark(div.benchmarks);
+
+    let benchmarkPct = null;
+    let statusClass;
+
+    if (bench) {
+      benchmarkPct = (bench.target / div.goal) * 100;
+      statusClass = getStatusClass(pct, benchmarkPct);
+    } else {
+      statusClass = getStatusClass(pct, null);
+    }
+
+    const card = createEl('div', 'division-card status-' + statusClass);
+
+    // Header row
+    const header = createEl('div', 'div-header');
+    const headerLeft = document.createElement('div');
+    headerLeft.appendChild(createEl('div', 'div-name', div.name));
+    headerLeft.appendChild(createEl('div', 'div-lead', div.leads));
+    header.appendChild(headerLeft);
+    header.appendChild(createEl('div', 'div-pct', pct.toFixed(0) + '%'));
+    card.appendChild(header);
+
+    // Progress bar
+    const barTrack = createEl('div', 'div-bar-track');
+    const barFill = createEl('div', 'div-bar-fill status-' + statusClass);
+    barFill.style.width = pct + '%';
+    barTrack.appendChild(barFill);
+    card.appendChild(barTrack);
+
+    // Stats
+    const stats = createEl('div', 'div-stats');
+    stats.appendChild(createEl('span', 'amount', fmtMoney(raised) + ' / ' + fmtMoney(div.goal)));
+    stats.appendChild(createEl('span', null, count + ' fundraiser' + (count !== 1 ? 's' : '')));
+    card.appendChild(stats);
+
+    // Benchmark
+    if (bench) {
+      const diff = raised - bench.target;
+      const badgeClass = diff >= 0 ? 'ahead' : (diff >= -bench.target * 0.15 ? 'on-track' : 'behind');
+      const badgeText = diff >= 0 ? 'On Track' : 'Behind';
+
+      const benchDiv = createEl('div', 'div-benchmark');
+      benchDiv.appendChild(createEl('span', null, (bench.upcoming ? 'Next' : bench.label) + ' target: ' + fmtMoney(bench.target)));
+      benchDiv.appendChild(createEl('span', 'benchmark-badge ' + badgeClass, badgeText));
+      card.appendChild(benchDiv);
+    }
+
+    grid.appendChild(card);
+  });
+
+  // Leaderboard
+  const top10 = allFundraisers.sort(function(a, b) { return b.amount - a.amount; }).slice(0, 10);
+  const lbBody = document.getElementById('leaderboardBody');
+  lbBody.textContent = '';
+
+  if (top10.length === 0) {
+    const empty = createEl('div', null, 'No fundraiser data loaded yet.');
+    empty.style.textAlign = 'center';
+    empty.style.color = 'var(--gray-400)';
+    empty.style.padding = '20px';
+    empty.style.fontSize = '14px';
+    lbBody.appendChild(empty);
+  } else {
+    top10.forEach(function(f, i) {
+      const row = createEl('div', 'leader-row');
+      row.appendChild(createEl('div', 'leader-rank' + (i < 3 ? ' top-3' : ''), String(i + 1)));
+      row.appendChild(createEl('div', 'leader-name', f.name));
+      row.appendChild(createEl('div', 'leader-division', f.division || 'Unassigned'));
+      row.appendChild(createEl('div', 'leader-amount', fmtMoney(f.amount)));
+      lbBody.appendChild(row);
+    });
+  }
+
+  // Footer
+  document.getElementById('footer').textContent = 'Last updated: ' + new Date().toLocaleString();
+}
+
+// File handlers
+document.getElementById('fundraiserFile').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    fundraiserData = parseCSV(ev.target.result);
+    document.getElementById('fundraiserStatus').textContent = file.name + ' loaded (' + fundraiserData.length + ' rows)';
+    render();
+  };
+  reader.readAsText(file);
+});
+
+document.getElementById('divisionFile').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const rows = parseCSV(ev.target.result);
+    divisionMap = {};
+    rows.forEach(function(r) {
+      const name = r.fundraiser_name || r.name || '';
+      const div = r.division || '';
+      if (name && div) divisionMap[name] = div;
+    });
+    document.getElementById('divisionStatus').textContent = file.name + ' loaded (' + rows.length + ' mappings)';
+    render();
+  };
+  reader.readAsText(file);
+});
+
+// Auto-load local files if served from same directory
+async function tryAutoLoad() {
+  try {
+    const results = await Promise.all([
+      fetch('fundraiser-data.csv').catch(function() { return null; }),
+      fetch('divisions.csv').catch(function() { return null; })
+    ]);
+    const frRes = results[0];
+    const dvRes = results[1];
+
+    if (dvRes && dvRes.ok) {
+      const text = await dvRes.text();
+      const rows = parseCSV(text);
+      divisionMap = {};
+      rows.forEach(function(r) {
+        const name = r.fundraiser_name || r.name || '';
+        const div = r.division || '';
+        if (name && div) divisionMap[name] = div;
+      });
+      document.getElementById('divisionStatus').textContent = 'divisions.csv (auto-loaded, ' + rows.length + ' mappings)';
+    }
+
+    if (frRes && frRes.ok) {
+      const text = await frRes.text();
+      fundraiserData = parseCSV(text);
+      document.getElementById('fundraiserStatus').textContent = 'fundraiser-data.csv (auto-loaded, ' + fundraiserData.length + ' rows)';
+    }
+
+    render();
+  } catch(e) {
+    render();
+  }
+}
+
+tryAutoLoad();
+</script>
+</body>
+</html>
