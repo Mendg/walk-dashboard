@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Walk4Friendship Dashboard - Design Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #f0ede9; }
+
+/* Tab bar */
+.tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #1b365d;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.tab-bar-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-right: 24px;
+  padding: 14px 0;
+  white-space: nowrap;
+}
+.tab {
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.tab:hover { color: rgba(255,255,255,0.8); }
+.tab.active { color: white; border-bottom-color: #36bbae; }
+
+.tab-desc {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  padding: 14px 0;
+  white-space: nowrap;
+}
+
+/* Frames */
+.variant-frame {
+  display: none;
+  width: 100%;
+  min-height: calc(100vh - 47px);
+  border: none;
+}
+.variant-frame.active { display: block; }
+
+@media (max-width: 700px) {
+  .tab-bar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .tab-bar-label { display: none; }
+  .tab-desc { display: none; }
+  .tab { padding: 12px 14px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="tab-bar">
+  <span class="tab-bar-label">Design Lab</span>
+  <button class="tab active" data-variant="a" onclick="switchTab('a')">A: Hero Ring</button>
+  <button class="tab" data-variant="b" onclick="switchTab('b')">B: Dark Premium</button>
+  <button class="tab" data-variant="c" onclick="switchTab('c')">C: Thermometer</button>
+  <button class="tab" data-variant="d" onclick="switchTab('d')">D: Bar Chart</button>
+  <button class="tab" data-variant="e" onclick="switchTab('e')">E: Nike Energy</button>
+  <span class="tab-desc" id="tabDesc">Immersive hero with circular progress ring</span>
+</div>
+
+<iframe id="frame-a" class="variant-frame active" src="about:blank"></iframe>
+<iframe id="frame-b" class="variant-frame" src="about:blank"></iframe>
+<iframe id="frame-c" class="variant-frame" src="about:blank"></iframe>
+<iframe id="frame-d" class="variant-frame" src="about:blank"></iframe>
+<iframe id="frame-e" class="variant-frame" src="about:blank"></iframe>
+
+<script>
+const descriptions = {
+  a: "Immersive hero with circular progress ring",
+  b: "Full dark mode analytics dashboard",
+  c: "Centered thermometer, Charity Water-inspired",
+  d: "Horizontal bar chart with sticky header",
+  e: "Oversized numbers, podium leaderboard"
+};
+
+const loaded = {};
+
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelector('.tab[data-variant="'+id+'"]').classList.add('active');
+  document.querySelectorAll('.variant-frame').forEach(f => f.classList.remove('active'));
+  document.getElementById('frame-'+id).classList.add('active');
+  document.getElementById('tabDesc').textContent = descriptions[id];
+
+  if (!loaded[id]) {
+    loaded[id] = true;
+    // Build the variant HTML with embedded sample data
+    const frame = document.getElementById('frame-'+id);
+    frame.srcdoc = variants[id];
+  }
+}
+
+// Sample data embedded
+const SAMPLE_DATA = [
+  {name:"Lisa Menuck",amount:12500,division:"Families"},
+  {name:"Emily",amount:8200,division:"Families"},
+  {name:"Alana",amount:6800,division:"Families"},
+  {name:"Sarah Cohen",amount:4500,division:"Families"},
+  {name:"Rachel Green",amount:3200,division:"Families"},
+  {name:"Jake Sherman",amount:8900,division:"Top 20 Teams"},
+  {name:"Michael Stern",amount:7500,division:"Top 20 Teams"},
+  {name:"Sam Horowitz",amount:5600,division:"Top 20 Teams"},
+  {name:"Daniel Ross",amount:6200,division:"Corporate"},
+  {name:"Miriam Gold",amount:4800,division:"Corporate"},
+  {name:"Rebecca Fried",amount:5100,division:"Individual"},
+  {name:"Ari Feldman",amount:3500,division:"Individual"},
+  {name:"Josh Katz",amount:3900,division:"FC Staff"},
+  {name:"Tova Singer",amount:2700,division:"FC Staff"},
+  {name:"Shayna",amount:3100,division:"Adult Volunteers"},
+  {name:"Leah Marcus",amount:4100,division:"Adult Volunteers"},
+  {name:"David Levy",amount:2800,division:"Adult Volunteers"},
+  {name:"Benny Greenwald",amount:4200,division:"Friendship House"},
+  {name:"Nomi Berger",amount:1200,division:"Friendship House"},
+  {name:"Kaitlin",amount:1800,division:"Schools"},
+  {name:"Hannah Weiss",amount:2100,division:"Schools"},
+  {name:"Airen",amount:2200,division:"Summer Camp Staff"},
+  {name:"Ben Adler",amount:3300,division:"Summer Camp Staff"},
+  {name:"Dovid",amount:1500,division:"Teen Volunteers"},
+  {name:"Chana",amount:900,division:"Teen Volunteers"},
+];
+
+// Shared JS logic (minified into each variant)
+const SHARED_JS = `
+const TOTAL_GOAL=1250000;
+const DIVISIONS=[
+{name:"Families",goal:550000,leads:"Emily, Alana, Julie",benchmarks:{"2026-07-12":150000,"2026-08-02":330000,"2026-08-23":480000}},
+{name:"Top 20 Teams",goal:390000,leads:"Julie",benchmarks:{"2026-07-12":100000,"2026-08-02":230000,"2026-08-23":340000}},
+{name:"Corporate",goal:370000,leads:"Julie",benchmarks:{"2026-07-12":200000,"2026-08-02":300000,"2026-08-23":370000}},
+{name:"Individual",goal:110000,leads:"Julie",benchmarks:{"2026-07-12":30000,"2026-08-02":65000,"2026-08-23":95000}},
+{name:"FC Staff",goal:70000,leads:"Julie",benchmarks:{"2026-07-12":20000,"2026-08-02":45000,"2026-08-23":62000}},
+{name:"Adult Volunteers",goal:50000,leads:"Mendel & Shayna",benchmarks:{"2026-07-12":13000,"2026-08-02":30000,"2026-08-23":44000}},
+{name:"Friendship House",goal:25000,leads:"Benny",benchmarks:{"2026-07-12":6000,"2026-08-02":14000,"2026-08-23":22000}},
+{name:"Schools",goal:15000,leads:"Kaitlin",benchmarks:{"2026-07-12":3000,"2026-08-02":9000,"2026-08-23":13000}},
+{name:"Summer Camp Staff",goal:15000,leads:"Airen",benchmarks:{"2026-07-12":4000,"2026-08-02":9000,"2026-08-23":13500}},
+{name:"Teen Volunteers",goal:10000,leads:"Dovid & Chana",benchmarks:{"2026-07-12":2500,"2026-08-02":6000,"2026-08-23":9000}}
+];
+const SAMPLE=${JSON.stringify(SAMPLE_DATA)};
+function fm(n){return n>=1e6?"$"+(n/1e6).toFixed(2)+"M":n>=1e3?"$"+Math.round(n).toLocaleString():"$"+n}
+function getBench(b){var today=new Date(),dates=Object.keys(b).sort(),ad=null,at=null;for(var i=0;i<dates.length;i++){if(today>=new Date(dates[i]+"T00:00:00")){ad=dates[i];at=b[dates[i]]}}if(!ad&&dates.length)return{target:b[dates[0]],label:"Jul 12",upcoming:true};if(!ad)return null;var md=new Date(ad+"T00:00:00");return{target:at,label:md.toLocaleDateString("en-US",{month:"short",day:"numeric"}),upcoming:false}}
+function getSC(p,bench){var bp=bench?bench.target/bench.goal*100:null;if(bp!==null){return p>=bp?"green":p>=bp*0.75?"yellow":"red"}return p>=50?"green":p>=25?"yellow":"red"}
+function daysLeft(){var w=new Date("2026-08-30");return Math.max(0,Math.ceil((w-new Date())/864e5))}
+function ce(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt)e.textContent=txt;return e}
+// Build division totals from sample
+var dt={},df={};DIVISIONS.forEach(function(d){dt[d.name]=0;df[d.name]=0});
+SAMPLE.forEach(function(s){if(dt.hasOwnProperty(s.division)){dt[s.division]+=s.amount;df[s.division]++}});
+var totalRaised=0;Object.keys(dt).forEach(function(k){totalRaised+=dt[k]});
+var totalPct=Math.min(totalRaised/TOTAL_GOAL*100,100);
+var sortedDivs=DIVISIONS.slice().sort(function(a,b){return(dt[b.name]||0)-(dt[a.name]||0)});
+var topFund=SAMPLE.slice().sort(function(a,b){return b.amount-a.amount});
+`;
+
+// ============= VARIANT A =============
+const variantA_html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1b365d;--navy-dark:#0f2240;--teal:#36bbae;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-400:#9ca3af;--gray-600:#4b5563;--gray-800:#1f2937;--cream:#f8f5f1}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800)}
+.bh{position:fixed;top:12px;right:20px;font-size:12px;color:var(--gray-400);z-index:10}
+.hero{background:linear-gradient(135deg,var(--navy-dark) 0%,var(--navy) 60%,#1e4a7a 100%);color:white;min-height:50vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px 24px 48px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(54,187,174,.15) 0%,transparent 70%);top:-200px;right:-100px}
+.hero-label{font-size:13px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.hero-ring{width:200px;height:200px;margin:0 auto 24px;position:relative}
+.hero-ring svg{transform:rotate(-90deg)}
+.hero-ring-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:42px;font-weight:800}
+.hero-amount{font-size:72px;font-weight:900;line-height:1;margin-bottom:8px}
+.hero-goal{font-size:20px;font-weight:400;opacity:.5;margin-bottom:32px}
+.hero-stats{display:flex;gap:48px;margin-top:24px}
+.hero-stat{text-align:center}
+.hero-stat-value{font-size:28px;font-weight:700}
+.hero-stat-label{font-size:12px;opacity:.5;text-transform:uppercase;letter-spacing:1px}
+.container{max-width:1200px;margin:0 auto;padding:48px 24px}
+.section-title{font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray-400);margin-bottom:24px}
+.divisions{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:20px;margin-bottom:56px}
+.div-card{background:white;border-radius:20px;padding:28px 30px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 20px rgba(0,0,0,.03);transition:transform .2s,box-shadow .2s;position:relative;overflow:hidden}
+.div-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.08)}
+.div-card-accent{position:absolute;top:0;left:0;right:0;height:4px}
+.div-card-accent.green{background:linear-gradient(90deg,var(--green),#34d399)}.div-card-accent.yellow{background:linear-gradient(90deg,var(--yellow),#fbbf24)}.div-card-accent.red{background:linear-gradient(90deg,var(--red),#f87171)}
+.div-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.div-name{font-size:18px;font-weight:700;color:var(--navy)}.div-lead{font-size:13px;color:var(--gray-400);margin-top:3px}
+.div-pct{font-size:32px;font-weight:900;color:var(--navy)}
+.div-bar{background:var(--gray-100);border-radius:8px;height:8px;overflow:hidden;margin-bottom:16px}
+.div-bar-fill{height:100%;border-radius:8px;transition:width .8s}
+.div-bar-fill.green{background:linear-gradient(90deg,var(--green),#34d399)}.div-bar-fill.yellow{background:linear-gradient(90deg,var(--yellow),#fbbf24)}.div-bar-fill.red{background:linear-gradient(90deg,var(--red),#f87171)}
+.div-bottom{display:flex;justify-content:space-between;align-items:center}
+.div-raised{font-size:22px;font-weight:700}.div-goal-text{font-size:14px;color:var(--gray-400)}.div-fundraisers{font-size:13px;color:var(--gray-400)}
+.div-bench{margin-top:16px;padding-top:14px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--gray-400)}
+.badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px}
+.badge.ahead{background:#dcfce7;color:#166534}.badge.behind{background:#fee2e2;color:#991b1b}
+.leaderboard{background:white;border-radius:20px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 20px rgba(0,0,0,.03)}
+.lb-row{display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--gray-100)}.lb-row:last-child{border-bottom:none}
+.lb-rank{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;margin-right:16px;flex-shrink:0}
+.lb-rank.gold{background:linear-gradient(135deg,#fbbf24,#d4a843);color:white}.lb-rank.silver{background:linear-gradient(135deg,#94a3b8,#64748b);color:white}.lb-rank.bronze{background:linear-gradient(135deg,#b45309,#92400e);color:white}.lb-rank.normal{background:var(--gray-100);color:var(--gray-600)}
+.lb-name{flex:1;font-size:15px;font-weight:600}.lb-div{font-size:13px;color:var(--gray-400);margin-right:20px}.lb-amount{font-size:16px;font-weight:800;color:var(--navy)}
+@media(max-width:640px){.hero{min-height:40vh;padding:40px 16px}.hero-amount{font-size:48px}.hero-stats{gap:24px}.hero-stat-value{font-size:20px}.divisions{grid-template-columns:1fr}}
+</style></head><body>
+<span class="bh">B"H</span>
+<section class="hero">
+<div class="hero-label">Walk4Friendship 2026</div>
+<div class="hero-ring"><svg width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="85" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="12"/><circle id="ring" cx="100" cy="100" r="85" fill="none" stroke="var(--teal)" stroke-width="12" stroke-dasharray="534" stroke-dashoffset="534" stroke-linecap="round"/></svg><div class="hero-ring-pct" id="ringPct">0%</div></div>
+<div class="hero-amount" id="hAmt">$0</div>
+<div class="hero-goal">of $1,250,000 goal</div>
+<div class="hero-stats"><div class="hero-stat"><div class="hero-stat-value" id="sFund">0</div><div class="hero-stat-label">Fundraisers</div></div><div class="hero-stat"><div class="hero-stat-value">10</div><div class="hero-stat-label">Divisions</div></div><div class="hero-stat"><div class="hero-stat-value" id="sDays">--</div><div class="hero-stat-label">Days Left</div></div></div>
+</section>
+<div class="container">
+<div class="section-title">Divisions</div><div class="divisions" id="grid"></div>
+<div class="section-title">Top Fundraisers</div><div class="leaderboard" id="lb"></div>
+</div>
+<script>${SHARED_JS}
+document.getElementById("hAmt").textContent=fm(totalRaised);
+document.getElementById("ringPct").textContent=Math.round(totalPct)+"%";
+document.getElementById("ring").setAttribute("stroke-dashoffset",String(534-534*(totalPct/100)));
+document.getElementById("sFund").textContent=SAMPLE.length;
+document.getElementById("sDays").textContent=daysLeft();
+var g=document.getElementById("grid");
+sortedDivs.forEach(function(div){var raised=dt[div.name]||0,p=Math.min(raised/div.goal*100,100),cnt=df[div.name]||0,bench=getBench(div.benchmarks);
+var sc;if(bench){var bp=bench.target/div.goal*100;sc=p>=bp?"green":p>=bp*.75?"yellow":"red"}else sc=p>=50?"green":p>=25?"yellow":"red";
+var c=ce("div","div-card");c.appendChild(ce("div","div-card-accent "+sc));
+var top=ce("div","div-top");var tl=document.createElement("div");tl.appendChild(ce("div","div-name",div.name));tl.appendChild(ce("div","div-lead",div.leads));top.appendChild(tl);top.appendChild(ce("div","div-pct",Math.round(p)+"%"));c.appendChild(top);
+var bar=ce("div","div-bar");var bf=ce("div","div-bar-fill "+sc);bf.style.width=p+"%";bar.appendChild(bf);c.appendChild(bar);
+var bot=ce("div","div-bottom");var rl=document.createElement("div");rl.appendChild(ce("span","div-raised",fm(raised)));rl.appendChild(ce("span","div-goal-text"," / "+fm(div.goal)));bot.appendChild(rl);bot.appendChild(ce("span","div-fundraisers",cnt+" fundraiser"+(cnt!==1?"s":"")));c.appendChild(bot);
+if(bench){var bd=ce("div","div-bench");bd.appendChild(ce("span",null,(bench.upcoming?"Next":"")+" target: "+fm(bench.target)));var diff=raised-bench.target;bd.appendChild(ce("span","badge "+(diff>=0?"ahead":"behind"),diff>=0?"On Track":"Behind"));c.appendChild(bd)}
+g.appendChild(c)});
+var lb=document.getElementById("lb");
+topFund.slice(0,10).forEach(function(f,i){var row=ce("div","lb-row");row.appendChild(ce("div","lb-rank "+(i===0?"gold":i===1?"silver":i===2?"bronze":"normal"),String(i+1)));row.appendChild(ce("div","lb-name",f.name));row.appendChild(ce("div","lb-div",f.division));row.appendChild(ce("div","lb-amount",fm(f.amount)));lb.appendChild(row)});
+</script></body></html>`;
+
+// ============= VARIANT B =============
+const variantB_html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0c1220;--card:#141d2e;--card-hover:#1a2740;--border:rgba(255,255,255,.06);--teal:#36bbae;--green:#22c55e;--yellow:#eab308;--red:#ef4444;--text:#e2e8f0;--text-dim:#64748b;--text-muted:#475569}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.bh{position:fixed;top:12px;right:20px;font-size:12px;color:var(--text-muted);z-index:10}
+.container{max-width:1280px;margin:0 auto;padding:32px 24px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px}
+.topbar h1{font-size:24px;font-weight:800}.topbar h1 span{color:var(--teal)}
+.kpi-strip{display:flex;gap:1px;background:var(--border);border-radius:20px;overflow:hidden;margin-bottom:32px}
+.kpi{flex:1;background:var(--card);padding:32px 28px;text-align:center}
+.kpi:first-child{border-radius:20px 0 0 20px}.kpi:last-child{border-radius:0 20px 20px 0}
+.kpi-value{font-size:40px;font-weight:900;margin-bottom:4px}.kpi-value.teal{color:var(--teal)}
+.kpi-label{font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
+.overall-bar-wrap{background:var(--card);border-radius:16px;padding:24px 28px;margin-bottom:32px}
+.overall-meta{display:flex;justify-content:space-between;margin-bottom:12px;font-size:14px}
+.overall-meta .label{color:var(--text-dim)}.overall-meta .value{font-weight:700}
+.overall-track{background:rgba(255,255,255,.06);border-radius:10px;height:12px;overflow:hidden}
+.overall-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--teal),#5ed4c8);transition:width .8s}
+.section-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--text-muted);margin-bottom:20px}
+.div-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:40px}
+.div-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;transition:background .2s}
+.div-card:hover{background:var(--card-hover)}
+.div-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px}
+.div-name{font-size:15px;font-weight:700}.div-lead{font-size:12px;color:var(--text-muted);margin-top:2px}
+.div-pct{font-size:28px;font-weight:900}.div-pct.green{color:var(--green)}.div-pct.yellow{color:var(--yellow)}.div-pct.red{color:var(--red)}
+.div-bar{background:rgba(255,255,255,.06);border-radius:6px;height:6px;margin-bottom:14px;overflow:hidden}
+.div-fill{height:100%;border-radius:6px;transition:width .6s}.div-fill.green{background:var(--green)}.div-fill.yellow{background:var(--yellow)}.div-fill.red{background:var(--red)}
+.div-stats{display:flex;justify-content:space-between;font-size:13px;color:var(--text-dim)}.div-stats .raised{font-weight:600;color:var(--text)}
+.div-bench{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--text-muted)}
+.pill{font-size:11px;font-weight:700;padding:2px 10px;border-radius:100px}
+.pill.ahead{background:rgba(34,197,94,.15);color:var(--green)}.pill.behind{background:rgba(239,68,68,.15);color:var(--red)}
+.lb-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px}
+.lb-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--border)}.lb-row:last-child{border-bottom:none}
+.lb-rank{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin-right:14px;flex-shrink:0}
+.lb-rank.r1{background:linear-gradient(135deg,#fbbf24,#b45309);color:white}.lb-rank.r2{background:linear-gradient(135deg,#94a3b8,#475569);color:white}.lb-rank.r3{background:linear-gradient(135deg,#a16207,#78350f);color:white}.lb-rank.rn{background:rgba(255,255,255,.06);color:var(--text-dim)}
+.lb-name{flex:1;font-size:14px;font-weight:600}.lb-div{font-size:12px;color:var(--text-muted);margin-right:16px}.lb-amount{font-size:15px;font-weight:800;color:var(--teal)}
+@media(max-width:640px){.kpi-strip{flex-direction:column;border-radius:16px}.kpi:first-child{border-radius:16px 16px 0 0}.kpi:last-child{border-radius:0 0 16px 16px}.kpi{padding:20px}.kpi-value{font-size:28px}.div-grid{grid-template-columns:1fr}}
+</style></head><body>
+<span class="bh">B"H</span>
+<div class="container">
+<div class="topbar"><h1>Walk<span>4</span>Friendship</h1></div>
+<div class="kpi-strip"><div class="kpi"><div class="kpi-value teal" id="kTotal">$0</div><div class="kpi-label">Total Raised</div></div><div class="kpi"><div class="kpi-value" id="kPct">0%</div><div class="kpi-label">Of Goal</div></div><div class="kpi"><div class="kpi-value" id="kFund">0</div><div class="kpi-label">Fundraisers</div></div><div class="kpi"><div class="kpi-value" id="kDays">--</div><div class="kpi-label">Days Left</div></div></div>
+<div class="overall-bar-wrap"><div class="overall-meta"><span class="label">Campaign Progress</span><span class="value" id="oMeta"></span></div><div class="overall-track"><div class="overall-fill" id="oBar" style="width:0%"></div></div></div>
+<div class="section-label">Divisions</div><div class="div-grid" id="grid"></div>
+<div class="section-label">Leaderboard</div><div class="lb-card" id="lb"></div>
+</div>
+<script>${SHARED_JS}
+document.getElementById("kTotal").textContent=fm(totalRaised);document.getElementById("kPct").textContent=Math.round(totalPct)+"%";document.getElementById("kFund").textContent=SAMPLE.length;document.getElementById("kDays").textContent=daysLeft();
+document.getElementById("oMeta").textContent=fm(totalRaised)+" / "+fm(TOTAL_GOAL);document.getElementById("oBar").style.width=totalPct+"%";
+var g=document.getElementById("grid");
+sortedDivs.forEach(function(div){var raised=dt[div.name]||0,p=Math.min(raised/div.goal*100,100),cnt=df[div.name]||0,bench=getBench(div.benchmarks);
+var sc;if(bench){var bp=bench.target/div.goal*100;sc=p>=bp?"green":p>=bp*.75?"yellow":"red"}else sc=p>=50?"green":p>=25?"yellow":"red";
+var c=ce("div","div-card");var top=ce("div","div-top");var tl=document.createElement("div");tl.appendChild(ce("div","div-name",div.name));tl.appendChild(ce("div","div-lead",div.leads));top.appendChild(tl);top.appendChild(ce("div","div-pct "+sc,Math.round(p)+"%"));c.appendChild(top);
+var bar=ce("div","div-bar");var bf=ce("div","div-fill "+sc);bf.style.width=p+"%";bar.appendChild(bf);c.appendChild(bar);
+var st=ce("div","div-stats");st.appendChild(ce("span","raised",fm(raised)+" / "+fm(div.goal)));st.appendChild(ce("span",null,cnt+" fundraiser"+(cnt!==1?"s":"")));c.appendChild(st);
+if(bench){var bd=ce("div","div-bench");bd.appendChild(ce("span",null,(bench.upcoming?"Next":"")+" target: "+fm(bench.target)));var diff=raised-bench.target;bd.appendChild(ce("span","pill "+(diff>=0?"ahead":"behind"),diff>=0?"On Track":"Behind"));c.appendChild(bd)}
+g.appendChild(c)});
+var lb=document.getElementById("lb");
+topFund.slice(0,10).forEach(function(f,i){var row=ce("div","lb-row");row.appendChild(ce("div","lb-rank "+(i===0?"r1":i===1?"r2":i===2?"r3":"rn"),String(i+1)));row.appendChild(ce("div","lb-name",f.name));row.appendChild(ce("div","lb-div",f.division));row.appendChild(ce("div","lb-amount",fm(f.amount)));lb.appendChild(row)});
+</script></body></html>`;
+
+// ============= VARIANT C =============
+const variantC_html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1b365d;--teal:#36bbae;--cream:#faf8f5;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-400:#9ca3af;--gray-600:#6b7280;--gray-800:#1f2937}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800)}
+.bh{position:fixed;top:12px;right:20px;font-size:12px;color:var(--gray-400);z-index:10}
+.hero{text-align:center;padding:60px 24px 48px}
+.hero-eyebrow{font-size:13px;font-weight:600;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px}
+.hero h1{font-size:44px;font-weight:900;color:var(--navy);line-height:1.1;margin-bottom:8px}
+.hero-sub{font-size:18px;color:var(--gray-600);margin-bottom:40px}
+.thermo-raised{font-size:48px;font-weight:900;color:var(--navy);margin-bottom:4px}
+.thermo-goal{font-size:16px;color:var(--gray-400);margin-bottom:8px}
+.thermo{max-width:600px;margin:0 auto 16px}
+.thermo-track{background:var(--gray-200);border-radius:30px;height:40px;overflow:hidden;position:relative}
+.thermo-fill{height:100%;border-radius:30px;background:linear-gradient(90deg,var(--teal),#5ed4c8);transition:width 1s cubic-bezier(.4,0,.2,1);position:relative}
+.thermo-fill::after{content:'';position:absolute;right:0;top:4px;width:32px;height:32px;border-radius:50%;background:white;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.thermo-labels{display:flex;justify-content:space-between;margin-top:12px;font-size:14px;color:var(--gray-400)}
+.stat-row{display:flex;justify-content:center;gap:48px;margin:32px 0 48px}
+.stat{text-align:center}.stat-value{font-size:32px;font-weight:800;color:var(--navy)}.stat-label{font-size:13px;color:var(--gray-400);margin-top:2px}
+.container{max-width:960px;margin:0 auto;padding:0 24px 48px}
+.div-section-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray-400);margin-bottom:24px;text-align:center}
+.div-item{background:white;border-radius:20px;padding:28px 32px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04);display:flex;align-items:center;gap:28px;transition:transform .15s,box-shadow .15s}
+.div-item:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(0,0,0,.06)}
+.div-rank{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;flex-shrink:0}
+.div-rank.green{background:var(--green)}.div-rank.yellow{background:var(--yellow)}.div-rank.red{background:var(--red)}
+.div-info{flex:1;min-width:0}
+.div-name{font-size:17px;font-weight:700;color:var(--navy)}.div-lead{font-size:12px;color:var(--gray-400)}
+.div-bar{background:var(--gray-100);border-radius:6px;height:8px;overflow:hidden;margin-top:10px}
+.div-bar-fill{height:100%;border-radius:6px;transition:width .6s}.div-bar-fill.green{background:var(--green)}.div-bar-fill.yellow{background:var(--yellow)}.div-bar-fill.red{background:var(--red)}
+.div-bar-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-top:4px}
+.div-numbers{text-align:right;flex-shrink:0}
+.div-raised{font-size:24px;font-weight:800;color:var(--navy)}.div-goal-text{font-size:13px;color:var(--gray-400)}
+.div-bench-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;margin-top:6px;display:inline-block}
+.div-bench-badge.ahead{background:#dcfce7;color:#166534}.div-bench-badge.behind{background:#fee2e2;color:#991b1b}
+.lb-card{background:white;border-radius:20px;padding:32px;box-shadow:0 1px 3px rgba(0,0,0,.04);margin-bottom:48px}
+.lb-row{display:flex;align-items:center;padding:12px 0;border-bottom:1px solid var(--gray-100)}.lb-row:last-child{border-bottom:none}
+.lb-num{width:28px;font-size:14px;font-weight:800;color:var(--gray-400);margin-right:14px;text-align:center}.lb-num.top{color:var(--navy)}
+.lb-name{flex:1;font-size:15px;font-weight:600}.lb-div{font-size:12px;color:var(--gray-400);margin-right:16px}.lb-amt{font-size:15px;font-weight:800;color:var(--teal)}
+@media(max-width:640px){.hero h1{font-size:28px}.thermo-raised{font-size:36px}.stat-row{gap:24px}.stat-value{font-size:24px}.div-item{flex-direction:column;text-align:center;gap:16px;padding:24px}.div-numbers{text-align:center}}
+</style></head><body>
+<span class="bh">B"H</span>
+<div class="hero">
+<div class="hero-eyebrow">Walk4Friendship 2026</div>
+<h1>Every Step Counts</h1>
+<p class="hero-sub">10 divisions. One goal. $1.25M for friendship.</p>
+<div class="thermo-raised" id="totalAmt">$0</div>
+<div class="thermo-goal">raised of $1,250,000</div>
+<div class="thermo"><div class="thermo-track"><div class="thermo-fill" id="thermoFill" style="width:0%"></div></div><div class="thermo-labels"><span>$0</span><span>$1.25M</span></div></div>
+<div class="stat-row"><div class="stat"><div class="stat-value" id="sFund">0</div><div class="stat-label">Fundraisers</div></div><div class="stat"><div class="stat-value">10</div><div class="stat-label">Divisions</div></div><div class="stat"><div class="stat-value" id="sDays">--</div><div class="stat-label">Days Left</div></div></div>
+</div>
+<div class="container">
+<div class="div-section-title">Divisions</div><div id="grid"></div>
+<div class="div-section-title" style="margin-top:56px">Top Fundraisers</div><div class="lb-card" id="lb"></div>
+</div>
+<script>${SHARED_JS}
+document.getElementById("totalAmt").textContent=fm(totalRaised);document.getElementById("thermoFill").style.width=totalPct+"%";document.getElementById("sFund").textContent=SAMPLE.length;document.getElementById("sDays").textContent=daysLeft();
+var g=document.getElementById("grid");var rank=1;
+sortedDivs.forEach(function(div){var raised=dt[div.name]||0,p=Math.min(raised/div.goal*100,100),cnt=df[div.name]||0,bench=getBench(div.benchmarks);
+var sc;if(bench){var bp=bench.target/div.goal*100;sc=p>=bp?"green":p>=bp*.75?"yellow":"red"}else sc=p>=50?"green":p>=25?"yellow":"red";
+var item=ce("div","div-item");item.appendChild(ce("div","div-rank "+sc,String(rank++)));
+var info=ce("div","div-info");info.appendChild(ce("div","div-name",div.name));info.appendChild(ce("div","div-lead",div.leads+" \\u00B7 "+cnt+" fundraiser"+(cnt!==1?"s":"")));
+var bar=ce("div","div-bar");var bf=ce("div","div-bar-fill "+sc);bf.style.width=p+"%";bar.appendChild(bf);info.appendChild(bar);
+var bm=ce("div","div-bar-meta");bm.appendChild(ce("span",null,Math.round(p)+"%"));bm.appendChild(ce("span",null,fm(raised)+" / "+fm(div.goal)));info.appendChild(bm);item.appendChild(info);
+var nums=ce("div","div-numbers");nums.appendChild(ce("div","div-raised",fm(raised)));nums.appendChild(ce("div","div-goal-text","of "+fm(div.goal)));
+if(bench){var diff=raised-bench.target;nums.appendChild(ce("div","div-bench-badge "+(diff>=0?"ahead":"behind"),diff>=0?"On Track":"Behind"))}
+item.appendChild(nums);g.appendChild(item)});
+var lb=document.getElementById("lb");
+topFund.slice(0,10).forEach(function(f,i){var row=ce("div","lb-row");row.appendChild(ce("div","lb-num "+(i<3?"top":""),String(i+1)));row.appendChild(ce("div","lb-name",f.name));row.appendChild(ce("div","lb-div",f.division));row.appendChild(ce("div","lb-amt",fm(f.amount)));lb.appendChild(row)});
+</script></body></html>`;
+
+// ============= VARIANT D =============
+const variantD_html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1b365d;--teal:#36bbae;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-400:#9ca3af;--gray-600:#4b5563;--gray-800:#1f2937}
+body{font-family:'Inter',sans-serif;background:white;color:var(--gray-800)}
+.bh{position:fixed;top:12px;right:20px;font-size:12px;color:var(--gray-400);z-index:10}
+.sticky-header{position:sticky;top:0;z-index:5;background:white;border-bottom:1px solid var(--gray-200);padding:16px 24px}
+.sticky-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.sticky-left h1{font-size:20px;font-weight:800;color:var(--navy)}
+.sticky-right{display:flex;align-items:center;gap:20px}
+.sticky-total{font-size:24px;font-weight:900;color:var(--teal)}
+.sticky-pct{font-size:14px;color:var(--gray-400)}
+.sticky-bar{width:200px;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden}
+.sticky-bar-fill{height:100%;background:var(--teal);border-radius:3px;transition:width .6s}
+.container{max-width:1100px;margin:0 auto;padding:40px 24px}
+.hero-row{display:flex;align-items:baseline;gap:16px;margin-bottom:8px}
+.hero-amount{font-size:64px;font-weight:900;color:var(--navy);line-height:1}
+.hero-goal{font-size:20px;color:var(--gray-400)}
+.full-bar{height:20px;background:var(--gray-100);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.full-bar-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--teal),#5ed4c8);transition:width .8s}
+.full-bar-markers{display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400);margin-bottom:40px}
+.bar-chart-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray-400);margin-bottom:20px}
+.bar-row{display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--gray-100)}
+.bar-label{width:180px;flex-shrink:0}.bar-label-name{font-size:14px;font-weight:700;color:var(--navy)}.bar-label-lead{font-size:11px;color:var(--gray-400)}
+.bar-visual{flex:1;margin:0 20px}
+.bar-track{height:28px;background:var(--gray-100);border-radius:6px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:6px;transition:width .6s;display:flex;align-items:center;padding-left:10px;font-size:12px;font-weight:700;color:white}
+.bar-fill.green{background:var(--green)}.bar-fill.yellow{background:var(--yellow)}.bar-fill.red{background:var(--red)}
+.bar-benchmark{position:absolute;top:0;bottom:0;width:2px;background:var(--navy);opacity:.3}
+.bar-numbers{width:140px;flex-shrink:0;text-align:right}
+.bar-raised{font-size:18px;font-weight:800;color:var(--navy)}.bar-goal-text{font-size:12px;color:var(--gray-400)}
+.bar-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;display:inline-block;margin-top:2px}
+.bar-status.ahead{background:#dcfce7;color:#166534}.bar-status.behind{background:#fee2e2;color:#991b1b}
+.lb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:48px}
+.lb-card{background:var(--gray-50);border-radius:14px;padding:20px;text-align:center;transition:transform .15s}
+.lb-card:hover{transform:translateY(-2px)}
+.lb-rank{width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;margin-bottom:8px}
+.lb-rank.gold{background:#fbbf24;color:white}.lb-rank.silver{background:#94a3b8;color:white}.lb-rank.bronze{background:#b45309;color:white}.lb-rank.normal{background:var(--gray-200);color:var(--gray-600)}
+.lb-name{font-size:14px;font-weight:600;margin-bottom:2px}.lb-div{font-size:11px;color:var(--gray-400);margin-bottom:6px}.lb-amount{font-size:20px;font-weight:800;color:var(--teal)}
+@media(max-width:768px){.sticky-bar{display:none}.hero-amount{font-size:40px}.bar-row{flex-direction:column;align-items:stretch;gap:8px}.bar-label{width:100%}.bar-visual{margin:0}.bar-numbers{width:100%;text-align:left;display:flex;gap:12px;align-items:baseline}.lb-grid{grid-template-columns:repeat(2,1fr)}}
+</style></head><body>
+<span class="bh">B"H</span>
+<div class="sticky-header"><div class="sticky-inner"><div class="sticky-left"><h1>Walk4Friendship 2026</h1></div><div class="sticky-right"><span class="sticky-total" id="sTotal">$0</span><span class="sticky-pct" id="sPct">0%</span><div class="sticky-bar"><div class="sticky-bar-fill" id="sBar" style="width:0%"></div></div></div></div></div>
+<div class="container">
+<div class="hero-row"><div class="hero-amount" id="hAmt">$0</div><div class="hero-goal">of $1,250,000</div></div>
+<div class="full-bar"><div class="full-bar-fill" id="fBar" style="width:0%"></div></div>
+<div class="full-bar-markers"><span>$0</span><span>$250K</span><span>$500K</span><span>$750K</span><span>$1M</span><span>$1.25M</span></div>
+<div class="bar-chart-title">Divisions</div><div id="grid"></div>
+<div class="bar-chart-title" style="margin-top:56px">Top Fundraisers</div><div class="lb-grid" id="lb"></div>
+</div>
+<script>${SHARED_JS}
+document.getElementById("hAmt").textContent=fm(totalRaised);document.getElementById("fBar").style.width=totalPct+"%";
+document.getElementById("sTotal").textContent=fm(totalRaised);document.getElementById("sPct").textContent=Math.round(totalPct)+"%";document.getElementById("sBar").style.width=totalPct+"%";
+var g=document.getElementById("grid");
+sortedDivs.forEach(function(div){var raised=dt[div.name]||0,p=Math.min(raised/div.goal*100,100),cnt=df[div.name]||0,bench=getBench(div.benchmarks);
+var sc;if(bench){var bp=bench.target/div.goal*100;sc=p>=bp?"green":p>=bp*.75?"yellow":"red"}else sc=p>=50?"green":p>=25?"yellow":"red";
+var row=ce("div","bar-row");
+var label=ce("div","bar-label");label.appendChild(ce("div","bar-label-name",div.name));label.appendChild(ce("div","bar-label-lead",div.leads));row.appendChild(label);
+var vis=ce("div","bar-visual");var track=ce("div","bar-track");var fill=ce("div","bar-fill "+sc);fill.style.width=p+"%";if(p>15)fill.textContent=Math.round(p)+"%";track.appendChild(fill);
+if(bench){var bm=ce("div","bar-benchmark");bm.style.left=(bench.target/div.goal*100)+"%";track.appendChild(bm)}
+vis.appendChild(track);row.appendChild(vis);
+var nums=ce("div","bar-numbers");nums.appendChild(ce("div","bar-raised",fm(raised)));nums.appendChild(ce("div","bar-goal-text","of "+fm(div.goal)));
+if(bench){var diff=raised-bench.target;nums.appendChild(ce("span","bar-status "+(diff>=0?"ahead":"behind"),diff>=0?"On Track":"Behind"))}
+row.appendChild(nums);g.appendChild(row)});
+var lb=document.getElementById("lb");
+topFund.slice(0,10).forEach(function(f,i){var card=ce("div","lb-card");card.appendChild(ce("div","lb-rank "+(i===0?"gold":i===1?"silver":i===2?"bronze":"normal"),String(i+1)));card.appendChild(ce("div","lb-name",f.name));card.appendChild(ce("div","lb-div",f.division));card.appendChild(ce("div","lb-amount",fm(f.amount)));lb.appendChild(card)});
+</script></body></html>`;
+
+// ============= VARIANT E =============
+const variantE_html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#1b365d;--teal:#36bbae;--teal-bright:#2dd4bf;--cream:#f8f5f1;--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-400:#9ca3af;--gray-600:#6b7280;--gray-800:#1f2937}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--gray-800)}
+.bh{position:fixed;top:12px;right:20px;font-size:12px;color:var(--gray-400);z-index:10}
+.hero{background:var(--navy);color:white;padding:64px 24px 56px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-80%;right:-20%;width:80%;height:200%;background:radial-gradient(ellipse,rgba(54,187,174,.08) 0%,transparent 60%)}
+.hero-eyebrow{font-size:14px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--teal);margin-bottom:20px}
+.hero-big-number{font-size:96px;font-weight:900;line-height:.9;margin-bottom:4px;background:linear-gradient(135deg,white 30%,var(--teal-bright));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-context{font-size:18px;opacity:.5;margin-bottom:36px}
+.seg-bar{display:flex;gap:3px;max-width:700px;margin:0 auto 12px;height:8px}
+.seg{flex:1;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+.seg-fill{height:100%;border-radius:4px;background:var(--teal);transition:width .6s}
+.seg-labels{display:flex;gap:3px;max-width:700px;margin:0 auto 32px}
+.seg-label{flex:1;text-align:center;font-size:9px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.5px}
+.hero-kpis{display:flex;justify-content:center;gap:56px}
+.hero-kpi{text-align:center}.hero-kpi-value{font-size:36px;font-weight:900}.hero-kpi-label{font-size:11px;text-transform:uppercase;letter-spacing:2px;opacity:.4;margin-top:2px}
+.container{max-width:1100px;margin:0 auto;padding:48px 24px}
+.section-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray-400);margin-bottom:24px}
+.div-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-bottom:56px}
+.div-card{background:white;border-radius:20px;padding:32px;box-shadow:0 1px 4px rgba(0,0,0,.04);position:relative;overflow:hidden;transition:transform .15s}
+.div-card:hover{transform:translateY(-3px)}
+.div-card-stripe{position:absolute;bottom:0;left:0;right:0;height:4px}
+.div-card-stripe.green{background:var(--green)}.div-card-stripe.yellow{background:var(--yellow)}.div-card-stripe.red{background:var(--red)}
+.div-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px}
+.div-name{font-size:16px;font-weight:700;color:var(--navy)}.div-lead{font-size:12px;color:var(--gray-400);margin-top:2px}
+.div-big-pct{font-size:44px;font-weight:900;line-height:1}.div-big-pct.green{color:var(--green)}.div-big-pct.yellow{color:var(--yellow)}.div-big-pct.red{color:var(--red)}
+.div-bar{background:var(--gray-100);border-radius:6px;height:8px;margin-bottom:14px;overflow:hidden}
+.div-bar-fill{height:100%;border-radius:6px;transition:width .6s}.div-bar-fill.green{background:var(--green)}.div-bar-fill.yellow{background:var(--yellow)}.div-bar-fill.red{background:var(--red)}
+.div-meta{display:flex;justify-content:space-between;font-size:14px}
+.div-raised{font-weight:700}.div-goal-text{color:var(--gray-400)}.div-count{color:var(--gray-400);font-size:13px}
+.div-bench{margin-top:14px;padding-top:12px;border-top:1px solid var(--gray-100);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--gray-400)}
+.pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px}
+.pill.ahead{background:#dcfce7;color:#166534}.pill.behind{background:#fee2e2;color:#991b1b}
+.podium{display:flex;justify-content:center;gap:16px;margin-bottom:24px;align-items:flex-end}
+.podium-card{background:white;border-radius:20px;padding:28px 24px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.04);width:180px}
+.podium-card.first{padding-bottom:40px}
+.podium-medal{font-size:32px;margin-bottom:8px}
+.podium-name{font-size:15px;font-weight:700;margin-bottom:2px}.podium-div{font-size:11px;color:var(--gray-400);margin-bottom:8px}.podium-amount{font-size:22px;font-weight:900;color:var(--teal)}
+.rest-list{max-width:600px;margin:0 auto}
+.rest-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid var(--gray-100)}.rest-row:last-child{border-bottom:none}
+.rest-num{width:24px;font-size:13px;font-weight:700;color:var(--gray-400);margin-right:12px}
+.rest-name{flex:1;font-size:14px;font-weight:500}.rest-div{font-size:12px;color:var(--gray-400);margin-right:14px}.rest-amt{font-size:14px;font-weight:700;color:var(--navy)}
+@media(max-width:768px){.hero-big-number{font-size:56px}.hero-kpis{gap:32px}.hero-kpi-value{font-size:24px}.div-grid{grid-template-columns:1fr}.podium{flex-direction:column;align-items:center}.podium-card{width:100%;max-width:300px}.podium-card.first{padding-bottom:28px}}
+</style></head><body>
+<span class="bh">B"H</span>
+<section class="hero">
+<div class="hero-eyebrow">Walk4Friendship 2026</div>
+<div class="hero-big-number" id="hAmt">$0</div>
+<div class="hero-context">raised toward $1,250,000</div>
+<div class="seg-bar" id="segBar"></div>
+<div class="seg-labels" id="segLabels"></div>
+<div class="hero-kpis"><div class="hero-kpi"><div class="hero-kpi-value" id="kFund">0</div><div class="hero-kpi-label">Fundraisers</div></div><div class="hero-kpi"><div class="hero-kpi-value">10</div><div class="hero-kpi-label">Divisions</div></div><div class="hero-kpi"><div class="hero-kpi-value" id="kDays">--</div><div class="hero-kpi-label">Days Left</div></div></div>
+</section>
+<div class="container">
+<div class="section-label">Divisions</div><div class="div-grid" id="grid"></div>
+<div class="section-label">Top Fundraisers</div><div class="podium" id="podium"></div><div class="rest-list" id="restList"></div>
+</div>
+<script>${SHARED_JS}
+document.getElementById("hAmt").textContent=fm(totalRaised);document.getElementById("kFund").textContent=SAMPLE.length;document.getElementById("kDays").textContent=daysLeft();
+var segBar=document.getElementById("segBar"),segLabels=document.getElementById("segLabels");
+var byGoal=DIVISIONS.slice().sort(function(a,b){return b.goal-a.goal});
+byGoal.forEach(function(div){var seg=ce("div","seg");seg.style.flex=div.goal;var fill=ce("div","seg-fill");fill.style.width=Math.min((dt[div.name]||0)/div.goal*100,100)+"%";seg.appendChild(fill);segBar.appendChild(seg);
+var lbl=ce("div","seg-label");lbl.style.flex=div.goal;lbl.textContent=div.name.split(" ")[0];segLabels.appendChild(lbl)});
+var g=document.getElementById("grid");
+sortedDivs.forEach(function(div){var raised=dt[div.name]||0,p=Math.min(raised/div.goal*100,100),cnt=df[div.name]||0,bench=getBench(div.benchmarks);
+var sc;if(bench){var bp=bench.target/div.goal*100;sc=p>=bp?"green":p>=bp*.75?"yellow":"red"}else sc=p>=50?"green":p>=25?"yellow":"red";
+var c=ce("div","div-card");c.appendChild(ce("div","div-card-stripe "+sc));
+var top=ce("div","div-top");var tl=document.createElement("div");tl.appendChild(ce("div","div-name",div.name));tl.appendChild(ce("div","div-lead",div.leads));top.appendChild(tl);top.appendChild(ce("div","div-big-pct "+sc,Math.round(p)+"%"));c.appendChild(top);
+var bar=ce("div","div-bar");var bf=ce("div","div-bar-fill "+sc);bf.style.width=p+"%";bar.appendChild(bf);c.appendChild(bar);
+var meta=ce("div","div-meta");var rl=document.createElement("div");rl.appendChild(ce("span","div-raised",fm(raised)));rl.appendChild(ce("span","div-goal-text"," / "+fm(div.goal)));meta.appendChild(rl);meta.appendChild(ce("span","div-count",cnt+" fundraiser"+(cnt!==1?"s":"")));c.appendChild(meta);
+if(bench){var bd=ce("div","div-bench");bd.appendChild(ce("span",null,(bench.upcoming?"Next":"")+" target: "+fm(bench.target)));var diff=raised-bench.target;bd.appendChild(ce("span","pill "+(diff>=0?"ahead":"behind"),diff>=0?"On Track":"Behind"));c.appendChild(bd)}
+g.appendChild(c)});
+var podium=document.getElementById("podium"),restList=document.getElementById("restList");
+var medals=["\\u{1F947}","\\u{1F948}","\\u{1F949}"];var order=[1,0,2];
+order.forEach(function(i){if(!topFund[i])return;var f=topFund[i];var card=ce("div","podium-card"+(i===0?" first":""));card.appendChild(ce("div","podium-medal",medals[i]));card.appendChild(ce("div","podium-name",f.name));card.appendChild(ce("div","podium-div",f.division));card.appendChild(ce("div","podium-amount",fm(f.amount)));podium.appendChild(card)});
+topFund.slice(3,10).forEach(function(f,i){var row=ce("div","rest-row");row.appendChild(ce("div","rest-num",String(i+4)));row.appendChild(ce("div","rest-name",f.name));row.appendChild(ce("div","rest-div",f.division));row.appendChild(ce("div","rest-amt",fm(f.amount)));restList.appendChild(row)});
+</script></body></html>`;
+
+const variants = { a: variantA_html, b: variantB_html, c: variantC_html, d: variantD_html, e: variantE_html };
+
+// Load first variant immediately
+loaded['a'] = true;
+document.getElementById('frame-a').srcdoc = variants['a'];
+
+// Resize iframes to content
+function resizeFrames() {
+  document.querySelectorAll('.variant-frame').forEach(function(frame) {
+    frame.onload = function() {
+      try {
+        frame.style.height = frame.contentDocument.body.scrollHeight + 50 + 'px';
+      } catch(e) {}
+    };
+  });
+}
+resizeFrames();
+</script>
+</body>
+</html>
